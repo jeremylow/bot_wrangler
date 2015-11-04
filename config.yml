@@ -1,14 +1,24 @@
+humans:
+    human1:
+        user_id: 3456
+    human2:
+        user_id: 4567
+
 main_app:
     consumer_key: mkey
     consumer_secret: msecret
-bot1:
-    use_main: false
-    consumer_key: key1
-    consumer_secret: secret1
-    access_key: akey1
-    access_secret: asecret1
-bot2:
-    use_main: true
-    access_key: akey2
-    access_secret: asecret2
 
+bots:
+    bot1:
+        use_main: false
+        consumer_key: key1
+        consumer_secret: secret1
+        access_key: akey1
+        access_secret: asecret1
+        user_id: 1234
+
+    bot2:
+        use_main: true
+        access_key: akey2
+        access_secret: asecret2
+        user_id: 2345
