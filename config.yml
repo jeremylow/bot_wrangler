@@ -1,0 +1,14 @@
+main_app:
+    consumer_key: mkey
+    consumer_secret: msecret
+bot1:
+    use_main: false
+    consumer_key: key1
+    consumer_secret: secret1
+    access_key: akey1
+    access_secret: asecret1
+bot2:
+    use_main: true
+    access_key: akey2
+    access_secret: asecret2
+
