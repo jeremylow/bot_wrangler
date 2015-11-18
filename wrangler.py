@@ -1,46 +1,125 @@
 import os
 import yaml
+import re
 
-from twython import Twython, TwythonStreamer
+import tweepy
 
-APP_KEY = os.environ['CONSUMER_KEY']
-APP_SECRET = os.environ['CONSUMER_SECRET']
-OAUTH_TOKEN = os.environ['ACCESS_KEY']
-OAUTH_TOKEN_SECRET = os.environ['ACCESS_SECRET']
+from models import Bot
+
+CONSUMER_KEY = os.environ['CONSUMER_KEY']
+CONSUMER_SECRET = os.environ['CONSUMER_SECRET']
+ACCESS_KEY = os.environ['ACCESS_KEY']
+ACCESS_SECRET = os.environ['ACCESS_SECRET']
+
+COMMANDS = [
+    'delete',
+]
 
 
-class MyStreamer(TwythonStreamer):
+class WranglerStream(tweepy.StreamListener):
 
     def __init__(self, *args, **kwargs):
-        with open('config.yml', 'r') as f:
-            cfg = yaml.load(f)
+        with open('config_secrets.yml', 'r') as f:
+            self.config = yaml.load(f)
 
         self.humans = []
-        for human in cfg['humans']:
-            self.humans.append(cfg['humans'][human]['user_id'])
+        for human in self.config['humans']:
+            self.humans.append(self.config['humans'][human]['user_id'])
 
-        super(MyStreamer, self).__init__(*args, **kwargs)
+        self.bot_ids = []
+        for bot in self.config['bots']:
+            self.bot_ids.append(self.config['bots'][bot]['user_id'])
 
-    def _get_bot_api():
-        api = Twython(APP_KEY,
-                      APP_SECRET,
-                      OAUTH_TOKEN,
-                      OAUTH_TOKEN_SECRET)
+        self.bot_names = []
+        for bot in self.config['bots']:
+            self.bot_names.append(bot.lower())
+
+        print("Wrangling bots:", ["{0}: {1}".format(bot[0], bot[1]) for bot in zip(self.bot_ids, self.bot_names)])
+
+        super(WranglerStream, self).__init__(*args, **kwargs)
+
+    @staticmethod
+    def _get_api():
+        auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+        auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
+        api = tweepy.API(auth, wait_on_rate_limit=True)
         return api
 
-    def on_success(self, data):
-        if 'direct_message' in data:
-            dm = data['direct_message']
-            if dm['sender_id'] in self.humans:
-                api = self._get_bot_api()
-                api.lookup_status(id=123)
+    @staticmethod
+    def _stripw(text):
+        """ Simple function to strip out all whitespace """
+        return re.sub(r'\s+', '', text)
 
+    def _execute_command(self,
+                         command=None,
+                         bot_name=None,
+                         sender=None,
+                         status=None):
+
+        if command in COMMANDS:
+            bot = Bot(self.config['bots'][bot_name])
+            if command == 'delete':
+                bot.delete_status(status=status)
+        else:
+            api = self._get_api()
+            api.send_direct_message(
+                user_id=sender,
+                text="{0} command not found.".format(command))
+
+    def on_connect(self):
+        self.api = self._get_api()
+        print('Connected!')
+
+    def on_status(self, status):
+        """ Basic case: reply to a tweet with a command. """
+
+        command = None
+        status_id = None
+        bot_name = None
+        sender = None
+
+        print(status)
+
+        try:
+            if status.get('in_reply_to_user_id') in self.bot_ids:
+                print('got reply')
+                sender = status.get('user').get('id')
+                status_id = status.get('in_reply_to_status_id')
+                screenname = '@{0}'.format(status.get('in_reply_to_screen_name'))
+                bot_name = status.get('in_reply_to_screen_name').lower()
+                text = status.get('text').replace(screenname, '')
+                command = self._stripw(text).lower()
+
+            print('found:', status_id, bot_name, command)
+
+            if command and bot_name and sender:
+                self._execute_command(
+                    command=command,
+                    bot_name=bot_name,
+                    sender=sender,
+                    status=status_id)
+        except Exception as e:
+            print(e)
+
+
+def main():
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
+    api = tweepy.API(auth, wait_on_rate_limit=True)
+
+    with open('config_secrets.yml', 'r') as f:
+        config = yaml.load(f)
+
+    humans = []
+    for human in config['humans']:
+        humans.append(str(config['humans'][human]['user_id']))
+    print("Tracking humans:", humans)
+
+    stream = tweepy.Stream(auth, WranglerStream())
+    stream.filter(follow=humans)
 
 if __name__ == '__main__':
-    stream = MyStreamer(
-        APP_KEY,
-        APP_SECRET,
-        OAUTH_TOKEN,
-        OAUTH_TOKEN_SECRET)
-
-    stream.user()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\nLater, alligator\n\n")

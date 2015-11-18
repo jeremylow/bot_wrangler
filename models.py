@@ -1,4 +1,4 @@
-import twython
+from twython import Twython
 import yaml
 
 with open('config.yml', 'r') as f:
@@ -8,9 +8,10 @@ with open('config.yml', 'r') as f:
 
 class Bot(object):
 
-    """ Model for a bot that you control """
+    """ Model for a bot that you 'control' """
 
     def __init__(self, config=None, **kwargs):
+        print("Bots making bots")
         if config:
             for (param, val) in config.items():
                 setattr(self, param, config.get(param))
@@ -30,8 +31,19 @@ class Bot(object):
                 setattr(self, param, kwargs.get(param, default))
 
     def _get_api(self):
-        api = twython.Twython(self.consumer_key,
-                              self.consumer_secret,
-                              self.access_key,
-                              self.access_secret)
+        print("Creating bot API")
+        api = Twython(self.consumer_key,
+                      self.consumer_secret,
+                      self.access_key,
+                      self.access_secret)
         return api
+
+    def delete_status(self, status=None):
+        print('Initiating delete of status {0}'.format(status))
+        api = self._get_api()
+        try:
+            api.destroy_status(id=status)
+            print('Deleted status {0}'.format(status))
+            return True
+        except:
+            return False

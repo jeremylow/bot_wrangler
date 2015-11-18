@@ -14,4 +14,4 @@ __pycache__/
 .ipynb_checkpoints/
 *.ipynb
 .idea/
-
+config_secrets.yml
