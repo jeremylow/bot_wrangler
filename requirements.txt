@@ -6,8 +6,7 @@
 #
 oauthlib==1.0.3           # via requests-oauthlib
 pyyaml==3.11
-requests-oauthlib==0.5.0  # via tweepy, twython
-requests==2.8.1           # via requests-oauthlib, tweepy, twython
+requests-oauthlib==0.5.0  # via tweepy
+requests==2.8.1           # via requests-oauthlib, tweepy
 six==1.10.0               # via tweepy
 tweepy==3.4.0
-twython==3.3.0
