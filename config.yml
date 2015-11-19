@@ -2,6 +2,12 @@ humans:
     me:
         user_id: 372018022
 
+wrangler:
+    consumer_key:
+    consumer_secret:
+    access_key:
+    access_secret:
+
 main_app:
     # If you are using a One App Many Bots model, configure your main
     # application here.
@@ -19,4 +25,4 @@ bots:
         consumer_secret: consumer_secret
         access_key: access_key
         access_secret: access_secret
-        user_id: 3206731269
+        user_id: [bot user id]
