@@ -1,7 +1,7 @@
-from twython import Twython
+import tweepy
 import yaml
 
-with open('config.yml', 'r') as f:
+with open('config_secrets.yml', 'r') as f:
     cfg = yaml.load(f)
     MAIN = cfg['main_app']
 
@@ -11,7 +11,7 @@ class Bot(object):
     """ Model for a bot that you 'control' """
 
     def __init__(self, config=None, **kwargs):
-        print("Bots making bots")
+        print("Bots making bots. This will end well.")
         if config:
             for (param, val) in config.items():
                 setattr(self, param, config.get(param))
@@ -30,12 +30,12 @@ class Bot(object):
             for (param, default) in default_params.items():
                 setattr(self, param, kwargs.get(param, default))
 
+        print("Bot created:", self.__repr__())
+
     def _get_api(self):
-        print("Creating bot API")
-        api = Twython(self.consumer_key,
-                      self.consumer_secret,
-                      self.access_key,
-                      self.access_secret)
+        auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
+        auth.set_access_token(self.access_key, self.access_secret)
+        api = tweepy.API(auth, wait_on_rate_limit=True)
         return api
 
     def delete_status(self, status=None):
@@ -47,3 +47,9 @@ class Bot(object):
             return True
         except:
             return False
+
+    def __repr__(self):
+        return "Bot(ID: {0}, Main App: {1})".format(
+                self.user_id,
+                self.use_main
+            )
