@@ -53,7 +53,7 @@ class WranglerStream(tweepy.StreamListener):
     def _execute_command(self,
                          command=None,
                          bot_name=None,
-                         sender=None,
+                         wrangler=None,
                          status=None):
 
         if command in COMMANDS:
@@ -63,7 +63,7 @@ class WranglerStream(tweepy.StreamListener):
         else:
             api = self._get_api()
             api.send_direct_message(
-                user_id=sender,
+                user_id=wrangler,
                 text="{0} command not found.".format(command))
 
     def on_connect(self):
@@ -76,27 +76,27 @@ class WranglerStream(tweepy.StreamListener):
         command = None
         status_id = None
         bot_name = None
-        sender = None
+        wrangler = None
 
-        print(status)
+        status = status._json
 
         try:
-            if status.get('in_reply_to_user_id') in self.bot_ids:
+            if status['in_reply_to_user_id'] in self.bot_ids:
                 print('got reply')
-                sender = status.get('user').get('id')
-                status_id = status.get('in_reply_to_status_id')
-                screenname = '@{0}'.format(status.get('in_reply_to_screen_name'))
-                bot_name = status.get('in_reply_to_screen_name').lower()
-                text = status.get('text').replace(screenname, '')
+                wrangler = status['user']['id']
+                status_id = status['in_reply_to_status_id']
+                bot_screenname = '@{0}'.format(status['in_reply_to_screen_name'])
+                bot_name = status['in_reply_to_screen_name'].lower()
+                text = status['text'].replace(bot_screenname, '')
                 command = self._stripw(text).lower()
 
             print('found:', status_id, bot_name, command)
 
-            if command and bot_name and sender:
+            if command and bot_name and wrangler:
                 self._execute_command(
                     command=command,
                     bot_name=bot_name,
-                    sender=sender,
+                    wrangler=wrangler,
                     status=status_id)
         except Exception as e:
             print(e)
@@ -105,7 +105,6 @@ class WranglerStream(tweepy.StreamListener):
 def main():
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
-    api = tweepy.API(auth, wait_on_rate_limit=True)
 
     with open('config_secrets.yml', 'r') as f:
         config = yaml.load(f)
