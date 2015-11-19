@@ -2,6 +2,14 @@
 
 ##### Usage
 
+The gist is that you can run a bot wrangler independent of your bots but if they tweet something that you don't like, you have an easy way to delete that tweet without having to log into their account and manually delete it.
+
+The basic configuration is to add your user id on twitter to the `humans` part of the `config_secrets.py`. If you want other people to be able to wrangle your bots, just add another human (give them a different name from `me`, which is only a suggestion anyway). They don't have to give you any special info (no access keys or anything), but they can reply to a bot's tweet with `@[bot] delete` and the bot will delete that tweet itself.
+
+The `delete` command is the only one currently implemented (only one I could think of...), but if folks have other ideas, please let me know.
+
+##### Installation
+
 Highly suggested that you use a virtual environment for this.
 
 * Create a new application on twitter for your bot wrangler. Ideally (I guess?) this is controlled by your user account or maybe just one of your bot accounts. It really doesn't matter.
@@ -11,7 +19,9 @@ Highly suggested that you use a virtual environment for this.
 * Run the wrangler with `python wrangler.py`
 
 
-##### Advanced Usage
+##### Advanced Installation
+
+Using a virtual environment is really highly recommended for this.
 
 If you're hosting this on a server and you have supervisord installed, you can use the files in the `conf` and `bin` directories to manage the wrangler though that.
 
