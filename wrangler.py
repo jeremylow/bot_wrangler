@@ -1,4 +1,3 @@
-import os
 import yaml
 import re
 
@@ -6,10 +5,12 @@ import tweepy
 
 from models import Bot
 
-CONSUMER_KEY = os.environ['CONSUMER_KEY']
-CONSUMER_SECRET = os.environ['CONSUMER_SECRET']
-ACCESS_KEY = os.environ['ACCESS_KEY']
-ACCESS_SECRET = os.environ['ACCESS_SECRET']
+with open('config_secrets.yml', 'r') as f:
+    config = yaml.load(f)
+    CONSUMER_KEY = config['wrangler']['consumer_key']
+    CONSUMER_SECRET = config['wrangler']['consumer_secret']
+    ACCESS_KEY = config['wrangler']['access_key']
+    ACCESS_SECRET = config['wrangler']['access_secret']
 
 COMMANDS = [
     'delete',

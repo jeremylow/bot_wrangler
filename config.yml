@@ -3,10 +3,10 @@ humans:
         user_id: 372018022
 
 wrangler:
-    consumer_key:
-    consumer_secret:
-    access_key:
-    access_secret:
+    consumer_key: asdf
+    consumer_secret: asdf
+    access_key: asdf
+    access_secret: asdf
 
 main_app:
     # If you are using a One App Many Bots model, configure your main
