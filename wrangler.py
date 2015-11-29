@@ -35,7 +35,9 @@ class WranglerStream(tweepy.StreamListener):
         for bot in self.config['bots']:
             self.bot_names.append(bot.lower())
 
-        print("Wrangling bots:", ["{0}: {1}".format(bot[0], bot[1]) for bot in zip(self.bot_ids, self.bot_names)])
+        print(
+            "Wrangling bots:",
+            ["{0}: {1}".format(bot[0], bot[1]) for bot in zip(self.bot_ids, self.bot_names)])
 
         super(WranglerStream, self).__init__(*args, **kwargs)
 
@@ -54,7 +56,7 @@ class WranglerStream(tweepy.StreamListener):
     def _execute_command(self,
                          command=None,
                          bot_name=None,
-                         wrangler=None,
+                         human=None,
                          status=None):
 
         if command in COMMANDS:
@@ -64,7 +66,7 @@ class WranglerStream(tweepy.StreamListener):
         else:
             api = self._get_api()
             api.send_direct_message(
-                user_id=wrangler,
+                user_id=human,
                 text="{0} command not found.".format(command))
 
     def on_connect(self):
@@ -77,14 +79,14 @@ class WranglerStream(tweepy.StreamListener):
         command = None
         status_id = None
         bot_name = None
-        wrangler = None
+        human = None
 
         status = status._json
 
         try:
             if status['in_reply_to_user_id'] in self.bot_ids:
                 print('got reply')
-                wrangler = status['user']['id']
+                human = status['user']['id']
                 status_id = status['in_reply_to_status_id']
                 bot_screenname = '@{0}'.format(status['in_reply_to_screen_name'])
                 bot_name = status['in_reply_to_screen_name'].lower()
@@ -93,11 +95,11 @@ class WranglerStream(tweepy.StreamListener):
 
             print('found:', status_id, bot_name, command)
 
-            if command and bot_name and wrangler:
+            if command and bot_name and human:
                 self._execute_command(
                     command=command,
                     bot_name=bot_name,
-                    wrangler=wrangler,
+                    human=human,
                     status=status_id)
         except Exception as e:
             print(e)
