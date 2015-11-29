@@ -12,7 +12,6 @@ VENVDIR=/home/YOU/.venvs/bot_wrangler
 # the user and group the program should run as
 USER=YOU
 GROUP=YOU
-NUM_WORKERS=1
 
 # Activate the virtual environment
 source $VENVDIR/bin/activate
