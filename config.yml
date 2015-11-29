@@ -3,6 +3,9 @@ humans:
         user_id: 372018022
 
 wrangler:
+    # This is the application that will run the bot wrangler program and listen
+    # for commands from `humans` (above). This can be your personal account or
+    # whatever you want. It won't use very many API calls.
     consumer_key: asdf
     consumer_secret: asdf
     access_key: asdf
@@ -25,4 +28,4 @@ bots:
         consumer_secret: consumer_secret
         access_key: access_key
         access_secret: access_secret
-        user_id: [bot user id]
+        user_id: 1234
