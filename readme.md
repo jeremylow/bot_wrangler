@@ -28,7 +28,7 @@ If you're hosting this on a server and you have supervisord installed, you can u
 Symlink the wrangler.conf file to your `/etc/supervisord/conf.d/`:
 
     sudo ln -s bot_wrangler/conf/wrangler.conf /etc/supervisord/conf.d/wrangler.conf
-  
+
 You'll need to update the wrangler.conf file to your specific installation, though. There are a few things to note:
 
 * The `command` portion should point to the full path of the `bin/wrangler_start.sh` file wherever it is on your system. For me, that's something like /home/jeremy/bot_wrangler/bin/bot_wrangler.sh
